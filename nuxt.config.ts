@@ -12,22 +12,8 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ["@nuxt/content", "@nuxt/fonts"],
-
-  fonts: {
-    families: [
-      { name: "Londrina Solid", provider: "google" },
-      { name: "Inter", provider: "google" },
-    ],
-  },
-
-  css: ["~/assets/css/main.css"],
-
-  vite: {
-    plugins: [import("@tailwindcss/vite").then((m) => m.default())],
-  },
-
   app: {
+    baseURL: "/blog/",
     head: {
       htmlAttrs: { lang: "id" },
       titleTemplate: "%s | szuryuu",
@@ -42,5 +28,20 @@ export default defineNuxtConfig({
         { name: "format-detection", content: "telephone=no" },
       ],
     },
+  },
+
+  modules: ["@nuxt/content", "@nuxt/fonts"],
+
+  fonts: {
+    families: [
+      { name: "Londrina Solid", provider: "google" },
+      { name: "Inter", provider: "google" },
+    ],
+  },
+
+  css: ["~/assets/css/main.css"],
+
+  vite: {
+    plugins: [import("@tailwindcss/vite").then((m) => m.default())],
   },
 });
