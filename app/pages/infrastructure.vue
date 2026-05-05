@@ -6,19 +6,17 @@ useSeoMeta({
 </script>
 
 <template>
-  <div>
+  <div class="pt-8">
     <h1
-      class="font-heading text-5xl font-black mb-6 tracking-wide text-zinc-900 dark:text-zinc-100"
+      class="font-heading text-6xl sm:text-7xl md:text-8xl mb-12 text-ghost dark:text-ghost-dark tracking-wide leading-none"
     >
-      Infrastructure Logs
+      INFRASTRUCTURE
     </h1>
 
-    <div
-      class="bg-zinc-100 dark:bg-zinc-900 border-2 border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center"
-    >
-      <p class="text-zinc-600 dark:text-zinc-400 font-mono">
-        > STATUS: CLUSTER_INITIALIZING. <br />
-        > Logs will appear here.
+    <div class="max-w-2xl">
+      <p class="text-zinc-500 font-sans text-lg leading-relaxed">
+        Arsitektur, topologi, dan log pemantauan jaringan sedang dipetakan.
+        Menunggu transmisi data lebih lanjut.
       </p>
     </div>
   </div>

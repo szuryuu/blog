@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Inter", sans-serif;
   --font-heading: "Londrina Solid", sans-serif;
@@ -7,6 +9,25 @@
 
 @layer base {
   body {
-    @apply bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 antialiased min-h-screen;
+    @apply bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 antialiased min-h-screen transition-colors duration-300;
+  }
+}
+
+@layer utilities {
+  .text-ghost {
+    color: transparent;
+    -webkit-text-stroke: 2.5px #18181b;
+  }
+
+  .dark .text-ghost-dark {
+    color: transparent;
+    -webkit-text-stroke: 2.5px #ffffff;
+    text-shadow: 0 0 24px rgba(255, 255, 255, 0.15);
+  }
+
+  .dark .group:hover .group-hover\:text-ghost-dark {
+    color: transparent;
+    -webkit-text-stroke: 2.5px #ffffff;
+    text-shadow: 0 0 24px rgba(255, 255, 255, 0.25);
   }
 }

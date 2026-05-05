@@ -21,38 +21,38 @@ useSeoMeta({
 </script>
 
 <template>
-  <article v-if="page" class="max-w-none">
+  <article v-if="page" class="max-w-none pt-8">
     <NuxtLink
       to="/"
-      class="inline-flex items-center gap-2 font-mono text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors mb-8"
+      class="inline-flex items-center font-mono text-xs uppercase tracking-widest text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors mb-16"
     >
-      <span><- Return to Terminal</span>
+      <- Back to Logs
     </NuxtLink>
 
-    <header class="mb-12 border-b-2 border-zinc-200 dark:border-zinc-800 pb-8">
-      <div class="flex flex-wrap gap-2 mb-4">
+    <header class="mb-20">
+      <div class="flex flex-wrap gap-4 mb-8">
         <span
           v-for="tag in page.tags"
           :key="tag"
-          class="px-2 py-0.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono text-xs uppercase tracking-widest"
+          class="font-mono text-xs uppercase tracking-widest text-zinc-400"
         >
-          {{ tag }}
+          #{{ tag }}
         </span>
       </div>
 
       <h1
-        class="font-heading text-4xl sm:text-5xl font-black text-zinc-900 dark:text-zinc-100 mb-4 leading-tight"
+        class="font-heading text-6xl sm:text-7xl md:text-8xl text-ghost dark:text-ghost-dark tracking-wide mb-8 leading-none"
       >
         {{ page.title }}
       </h1>
 
-      <time class="font-mono text-sm text-zinc-500 dark:text-zinc-400">
-        {{ page.date }}
+      <time class="font-mono text-sm text-zinc-500 block">
+        [ {{ page.date }} ]
       </time>
     </header>
 
     <div
-      class="prose prose-zinc dark:prose-invert prose-headings:font-heading prose-headings:font-black max-w-none"
+      class="prose prose-zinc dark:prose-invert prose-lg prose-headings:font-heading prose-headings:font-black prose-headings:text-zinc-900 dark:prose-headings:text-zinc-100 max-w-none"
     >
       <ContentRenderer :value="page" />
     </div>

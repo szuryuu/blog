@@ -8,61 +8,53 @@ import {
   Instagram,
   MapPin,
 } from "lucide-vue-next";
+import ThemeToggle from "./ThemeToggle.vue";
 
-defineProps({
-  isOpen: {
-    type: Boolean,
-    default: false,
-  },
-});
-
+defineProps({ isOpen: { type: Boolean, default: false } });
 defineEmits(["close"]);
 </script>
 
 <template>
   <aside
     :class="[
-      'w-72 fixed inset-y-0 left-0 bg-zinc-950 border-r-2 border-zinc-800 flex flex-col z-50 transition-transform duration-300 ease-in-out lg:translate-x-0',
+      'w-72 fixed inset-y-0 left-0 bg-zinc-100 dark:bg-zinc-900 flex flex-col z-50 transition-transform duration-300 ease-in-out lg:translate-x-0',
       isOpen ? 'translate-x-0' : '-translate-x-full',
     ]"
   >
-    <div class="p-8 flex flex-col items-center border-b-2 border-zinc-800">
+    <div class="p-10 flex flex-col items-center">
       <img
         src="/hero.png"
         alt="Profile"
-        class="w-32 h-32 rounded-full border-4 border-zinc-100 object-cover mb-4"
+        class="w-28 h-28 rounded-3xl object-cover mb-6 grayscale hover:grayscale-0 transition-all duration-500"
       />
       <NuxtLink
         @click="$emit('close')"
         to="/"
-        class="font-heading text-3xl font-black text-zinc-100 tracking-wider hover:text-zinc-300 transition-colors"
+        class="font-heading text-5xl tracking-wider transition-colors duration-300"
       >
         szuryuu
       </NuxtLink>
-      <p class="text-zinc-400 font-mono text-sm mt-2 text-center">
-        DevSecOps & Infrastructure
-      </p>
       <div
-        class="flex items-center gap-1.5 mt-3 text-xs text-zinc-500 font-mono uppercase tracking-widest"
+        class="flex items-center gap-2 mt-4 text-xs text-zinc-500 font-mono uppercase tracking-widest"
       >
         <MapPin :size="14" />
         <span>Sleman, ID</span>
       </div>
     </div>
 
-    <nav class="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-2">
+    <nav class="flex-1 py-8 px-6 flex flex-col gap-4">
       <NuxtLink
         @click="$emit('close')"
         to="/"
-        class="flex items-center gap-3 px-4 py-3 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 rounded-md font-mono text-sm transition-all border-2 border-transparent hover:border-zinc-700"
+        class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
       >
         <Terminal :size="18" />
-        <span>Terminal (Home)</span>
+        <span>Terminal</span>
       </NuxtLink>
       <NuxtLink
         @click="$emit('close')"
         to="/ctf"
-        class="flex items-center gap-3 px-4 py-3 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 rounded-md font-mono text-sm transition-all border-2 border-transparent hover:border-zinc-700"
+        class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
       >
         <Shield :size="18" />
         <span>CTF Writeups</span>
@@ -70,35 +62,39 @@ defineEmits(["close"]);
       <NuxtLink
         @click="$emit('close')"
         to="/infrastructure"
-        class="flex items-center gap-3 px-4 py-3 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 rounded-md font-mono text-sm transition-all border-2 border-transparent hover:border-zinc-700"
+        class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
       >
         <Network :size="18" />
-        <span>Infrastructure Logs</span>
+        <span>Infrastructure</span>
       </NuxtLink>
     </nav>
 
-    <div class="p-6 border-t-2 border-zinc-800 flex justify-center gap-2">
+    <div
+      class="p-8 flex items-center justify-center gap-4 border-t-2 border-zinc-200 dark:border-zinc-800/50"
+    >
       <a
         href="https://github.com/szuryuu"
         target="_blank"
-        class="p-2 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded-md transition-colors"
+        class="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-2xl transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
       >
         <Github :size="20" />
       </a>
       <a
         href="https://www.linkedin.com/in/shafwan-ilham-dzaky/"
         target="_blank"
-        class="p-2 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded-md transition-colors"
+        class="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-2xl transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
       >
         <Linkedin :size="20" />
       </a>
       <a
         href="https://www.instagram.com/szuryuu/"
         target="_blank"
-        class="p-2 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded-md transition-colors"
+        class="p-2 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-2xl transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
       >
         <Instagram :size="20" />
       </a>
+      <div class="w-px h-6 bg-zinc-300 dark:bg-zinc-700"></div>
+      <ThemeToggle />
     </div>
   </aside>
 </template>

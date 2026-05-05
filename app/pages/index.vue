@@ -10,46 +10,40 @@ useSeoMeta({
 </script>
 
 <template>
-  <div>
+  <div class="pt-8">
     <h1
-      class="font-heading text-5xl font-black mb-10 tracking-wide text-zinc-900 dark:text-zinc-100"
+      class="font-heading text-7xl sm:text-8xl md:text-9xl mb-20 text-ghost dark:text-ghost-dark tracking-wide"
     >
-      Latest Executions
+      LOGS
     </h1>
 
-    <div class="space-y-6">
+    <div class="flex flex-col gap-16">
       <NuxtLink
         v-for="post in posts"
         :key="post.path"
         :to="post.path"
-        class="block group bg-white dark:bg-zinc-900 border-2 border-zinc-900 dark:border-zinc-700 p-6 sm:p-8 hover:-translate-y-1 hover:translate-x-1 hover:shadow-[-8px_8px_0px_0px_rgba(24,24,27,1)] dark:hover:shadow-[-8px_8px_0px_0px_rgba(228,228,231,1)] transition-all duration-200"
+        class="group block"
       >
-        <div
-          class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-4 gap-2"
+        <time class="font-mono text-sm text-zinc-400 mb-3 block">
+          {{ post.date }}
+        </time>
+        <h2
+          class="text-4xl sm:text-5xl font-heading text-zinc-900 dark:text-zinc-100 group-hover:text-ghost dark:group-hover:text-ghost-dark transition-all duration-300 mb-4"
         >
-          <h2
-            class="text-2xl font-bold font-heading text-zinc-900 dark:text-zinc-100 group-hover:underline decoration-4 underline-offset-4"
-          >
-            {{ post.title }}
-          </h2>
-          <time
-            class="font-mono text-xs text-zinc-500 dark:text-zinc-400 shrink-0"
-          >
-            {{ post.date }}
-          </time>
-        </div>
-
-        <p class="text-zinc-600 dark:text-zinc-400 mb-6 leading-relaxed">
+          {{ post.title }}
+        </h2>
+        <p
+          class="text-zinc-500 font-sans text-lg max-w-2xl leading-relaxed mb-6"
+        >
           {{ post.description }}
         </p>
-
-        <div class="flex flex-wrap gap-2">
+        <div class="flex gap-4">
           <span
             v-for="tag in post.tags"
             :key="tag"
-            class="px-2.5 py-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-xs font-mono font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300"
+            class="font-mono text-xs uppercase tracking-widest text-zinc-400"
           >
-            {{ tag }}
+            #{{ tag }}
           </span>
         </div>
       </NuxtLink>

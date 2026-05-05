@@ -4,37 +4,38 @@ import { Menu, X } from "lucide-vue-next";
 import AppSidebar from "~/components/AppSidebar.vue";
 
 const isSidebarOpen = ref(false);
-
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
 };
 </script>
 
 <template>
-  <div
-    class="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex font-sans transition-colors duration-300"
-  >
+  <div class="min-h-screen flex transition-colors duration-300">
     <div
       v-if="isSidebarOpen"
       @click="toggleSidebar"
-      class="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm z-40 lg:hidden"
+      class="fixed inset-0 bg-zinc-950/80 z-40 lg:hidden backdrop-blur-sm"
     ></div>
 
     <AppSidebar :is-open="isSidebarOpen" @close="isSidebarOpen = false" />
 
     <div class="flex-1 lg:ml-72 flex flex-col min-h-screen w-full">
       <header
-        class="h-16 border-b-2 border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-6 lg:px-8 bg-zinc-50/90 dark:bg-zinc-950/90 backdrop-blur-md sticky top-0 z-30"
+        class="h-20 flex items-center justify-between px-6 lg:px-12 sticky top-0 z-30 bg-zinc-50/80 dark:bg-zinc-950/80 backdrop-blur-xl"
       >
         <div class="flex items-center gap-4">
           <button
             @click="toggleSidebar"
-            class="lg:hidden p-2 -ml-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            class="lg:hidden p-2 -ml-2 text-zinc-900 dark:text-zinc-100"
           >
             <Menu v-if="!isSidebarOpen" :size="24" />
             <X v-else :size="24" />
           </button>
-          <div class="font-mono text-sm text-zinc-500">~/szuryuu/blog</div>
+          <div
+            class="font-mono text-xs text-zinc-400 uppercase tracking-widest"
+          >
+            ~/szuryuu/blog
+          </div>
         </div>
       </header>
 
@@ -43,9 +44,9 @@ const toggleSidebar = () => {
       </main>
 
       <footer
-        class="py-8 text-center border-t-2 border-zinc-200 dark:border-zinc-800 font-mono text-xs text-zinc-500"
+        class="py-12 text-center font-mono text-xs text-zinc-400 uppercase tracking-widest"
       >
-        &copy; {{ new Date().getFullYear() }} szuryuu. All systems operational.
+        &copy; {{ new Date().getFullYear() }} szuryuu
       </footer>
     </div>
   </div>
