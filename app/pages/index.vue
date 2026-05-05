@@ -1,6 +1,6 @@
 <script setup>
-const { data: posts } = await useAsyncData("blog-list", () => {
-  return queryCollection("blog").order("date", "DESC").all();
+const { data: posts } = await useAsyncData("writing-list", () => {
+  return queryCollection("writing").order("date", "DESC").all();
 });
 
 useSeoMeta({
@@ -35,7 +35,7 @@ useSeoMeta({
           <time
             class="font-mono text-xs text-zinc-500 dark:text-zinc-400 shrink-0"
           >
-            {{ new Date(post.date).toISOString().split("T")[0] }}
+            {{ post.date }}
           </time>
         </div>
 
