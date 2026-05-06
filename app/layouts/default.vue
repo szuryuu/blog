@@ -2,7 +2,6 @@
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import { Menu, X, Search, Clock, Tag, List } from "lucide-vue-next";
 import { useRoute } from "vue-router";
-import AppSidebar from "~/components/AppSidebar.vue";
 
 const route = useRoute();
 const isSidebarOpen = ref(false);
@@ -291,40 +290,6 @@ const formatDate = (date) => {
       </footer>
     </div>
 
-    <div
-      v-if="isSearchOpen"
-      class="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]"
-    >
-      <div
-        @click="toggleSearch"
-        class="absolute inset-0 bg-zinc-950/60 backdrop-blur-sm"
-      ></div>
-      <div
-        class="relative w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 mx-4"
-      >
-        <div
-          class="flex items-center px-4 py-4 border-b border-zinc-100 dark:border-zinc-800"
-        >
-          <Search :size="20" class="text-zinc-400" />
-          <input
-            type="text"
-            placeholder="Search articles, CTFs, or infrastructure..."
-            class="flex-1 bg-transparent border-none outline-none px-4 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-500 font-sans"
-            autofocus
-          />
-          <button
-            @click="toggleSearch"
-            class="p-1 text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 rounded"
-          >
-            <X :size="20" />
-          </button>
-        </div>
-        <div
-          class="p-4 min-h-[300px] flex flex-col items-center justify-center text-zinc-500 font-sans"
-        >
-          Search functionality will be implemented soon.
-        </div>
-      </div>
-    </div>
+    <GlobalSearch :is-open="isSearchOpen" @close="isSearchOpen = false" />
   </div>
 </template>
