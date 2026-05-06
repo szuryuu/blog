@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import { Menu, X, Search, Clock, Tag, List } from "lucide-vue-next";
 import { useRoute } from "vue-router";
+import AppSidebar from "~/components/AppSidebar.vue";
 
 const route = useRoute();
 const isSidebarOpen = ref(false);
@@ -171,8 +172,13 @@ const formatDate = (date) => {
       <div
         class="flex flex-1 w-full max-w-7xl mx-auto px-6 lg:px-12 py-6 lg:py-12 gap-12 lg:gap-16"
       >
-        <main class="flex-1 min-w-0 max-w-4xl w-full mx-auto">
+        <main class="flex-1 min-w-0 max-w-4xl w-full mx-auto flex flex-col">
           <slot />
+          <footer
+            class="mt-auto pt-12 pb-4 font-mono text-xs text-zinc-400 uppercase tracking-widest text-left"
+          >
+            &copy; {{ new Date().getFullYear() }} szuryuu
+          </footer>
         </main>
 
         <aside
@@ -282,12 +288,6 @@ const formatDate = (date) => {
           </template>
         </aside>
       </div>
-
-      <footer
-        class="py-12 text-center font-mono text-xs text-zinc-400 uppercase tracking-widest"
-      >
-        &copy; {{ new Date().getFullYear() }} szuryuu
-      </footer>
     </div>
 
     <GlobalSearch :is-open="isSearchOpen" @close="isSearchOpen = false" />
