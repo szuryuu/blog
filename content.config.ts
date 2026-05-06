@@ -1,5 +1,16 @@
 import { defineContentConfig, defineCollection, z } from "@nuxt/content";
 
+// Ekstrak skema artikel agar bisa digunakan ulang untuk writing, ctf, dan infrastructure
+const articleSchema = z.object({
+  title: z.string().min(2).max(120),
+  description: z.string().min(2).max(300),
+  date: z.string(),
+  tags: z.array(z.string()).default([]),
+  cover: z.string().optional(),
+  featured: z.boolean().default(false),
+  order: z.number().default(0),
+});
+
 export default defineContentConfig({
   collections: {
     projects: defineCollection({
@@ -26,15 +37,19 @@ export default defineContentConfig({
     writing: defineCollection({
       type: "page",
       source: "writing/**/*.md",
-      schema: z.object({
-        title: z.string().min(2).max(120),
-        description: z.string().min(2).max(300),
-        date: z.string(),
-        tags: z.array(z.string()).default([]),
-        cover: z.string().optional(),
-        featured: z.boolean().default(false),
-        order: z.number().default(0),
-      }),
+      schema: articleSchema,
+    }),
+
+    ctf: defineCollection({
+      type: "page",
+      source: "ctf/**/*.md",
+      schema: articleSchema,
+    }),
+
+    infrastructure: defineCollection({
+      type: "page",
+      source: "infrastructure/**/*.md",
+      schema: articleSchema,
     }),
   },
 });
