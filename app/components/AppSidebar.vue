@@ -1,8 +1,12 @@
 <script setup>
 import {
+  Home,
   Terminal,
   Shield,
   Network,
+  FolderOpen,
+  Tag,
+  User,
   Github,
   Linkedin,
   Instagram,
@@ -10,7 +14,13 @@ import {
 } from "lucide-vue-next";
 import ThemeToggle from "./ThemeToggle.vue";
 
-defineProps({ isOpen: { type: Boolean, default: false } });
+defineProps({
+  isOpen: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 defineEmits(["close"]);
 </script>
 
@@ -42,31 +52,88 @@ defineEmits(["close"]);
       </div>
     </div>
 
-    <nav class="flex-1 py-8 px-6 flex flex-col gap-4">
-      <NuxtLink
-        @click="$emit('close')"
-        to="/"
-        class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
-      >
-        <Terminal :size="18" />
-        <span>Terminal</span>
-      </NuxtLink>
-      <NuxtLink
-        @click="$emit('close')"
-        to="/ctf"
-        class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
-      >
-        <Shield :size="18" />
-        <span>CTF Writeups</span>
-      </NuxtLink>
-      <NuxtLink
-        @click="$emit('close')"
-        to="/infrastructure"
-        class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
-      >
-        <Network :size="18" />
-        <span>Infrastructure</span>
-      </NuxtLink>
+    <nav class="flex-1 py-8 px-6 flex flex-col gap-6 overflow-y-auto">
+      <div class="flex flex-col gap-2">
+        <NuxtLink
+          @click="$emit('close')"
+          to="/"
+          class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
+          exact-active-class="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+        >
+          <Home :size="18" />
+          <span>Home</span>
+        </NuxtLink>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span
+          class="px-4 text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1"
+        >
+          Categories
+        </span>
+        <NuxtLink
+          @click="$emit('close')"
+          to="/writing"
+          class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
+          active-class="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+        >
+          <Terminal :size="18" />
+          <span>Writing</span>
+        </NuxtLink>
+        <NuxtLink
+          @click="$emit('close')"
+          to="/ctf"
+          class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
+          active-class="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+        >
+          <Shield :size="18" />
+          <span>CTF</span>
+        </NuxtLink>
+        <NuxtLink
+          @click="$emit('close')"
+          to="/infrastructure"
+          class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
+          active-class="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+        >
+          <Network :size="18" />
+          <span>Infrastructure</span>
+        </NuxtLink>
+        <NuxtLink
+          @click="$emit('close')"
+          to="/project-documentation"
+          class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
+          active-class="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+        >
+          <FolderOpen :size="18" />
+          <span>Projects</span>
+        </NuxtLink>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span
+          class="px-4 text-[10px] font-mono text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-1"
+        >
+          Explore
+        </span>
+        <NuxtLink
+          @click="$emit('close')"
+          to="/tags"
+          class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
+          active-class="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+        >
+          <Tag :size="18" />
+          <span>Tags</span>
+        </NuxtLink>
+        <NuxtLink
+          @click="$emit('close')"
+          to="/about"
+          class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
+          active-class="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+        >
+          <User :size="18" />
+          <span>About</span>
+        </NuxtLink>
+      </div>
     </nav>
 
     <div
