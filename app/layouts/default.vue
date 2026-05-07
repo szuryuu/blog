@@ -1,10 +1,11 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import { Menu, X, Search, Clock, Tag, List } from "lucide-vue-next";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import AppSidebar from "~/components/AppSidebar.vue";
 
 const route = useRoute();
+const router = useRouter();
 const isSidebarOpen = ref(false);
 
 const toggleSidebar = () => {
@@ -56,9 +57,15 @@ const { data: currentDoc, refresh } = await useAsyncData("layout-doc", () => {
 
 const activeId = ref("");
 let observer = null;
+let observerTimeout = null;
 
 const setupObserver = () => {
-  if (observer) observer.disconnect();
+  if (observer) {
+    observer.disconnect();
+  }
+  if (observerTimeout) {
+    clearTimeout(observerTimeout);
+  }
 
   observer = new IntersectionObserver(
     (entries) => {
@@ -71,14 +78,16 @@ const setupObserver = () => {
     { rootMargin: "-120px 0px -60% 0px", threshold: 0 },
   );
 
+  let retryCount = 0;
   const observeHeadings = () => {
     const headings = document.querySelectorAll("main h2, main h3");
     if (headings.length > 0) {
       headings.forEach((heading) => {
         if (heading.id) observer.observe(heading);
       });
-    } else {
-      setTimeout(observeHeadings, 100);
+    } else if (retryCount < 15) {
+      retryCount++;
+      observerTimeout = setTimeout(observeHeadings, 100);
     }
   };
 
@@ -91,7 +100,7 @@ const scrollToHeading = (id) => {
   if (el) {
     const y = el.getBoundingClientRect().top + window.scrollY - 100;
     window.scrollTo({ top: y, behavior: "smooth" });
-    history.pushState(null, null, `#${id}`);
+    router.push({ hash: `#${id}` }).catch(() => {});
   }
 };
 
@@ -108,7 +117,8 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  observer?.disconnect();
+  if (observer) observer.disconnect();
+  if (observerTimeout) clearTimeout(observerTimeout);
 });
 
 const formatDate = (date) => {
