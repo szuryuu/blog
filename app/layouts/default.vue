@@ -59,6 +59,7 @@ let observer = null;
 
 const setupObserver = () => {
   if (observer) observer.disconnect();
+
   observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -67,14 +68,31 @@ const setupObserver = () => {
         }
       });
     },
-    { rootMargin: "-10% 0px -80% 0px", threshold: 0.1 },
+    { rootMargin: "-120px 0px -60% 0px", threshold: 0 },
   );
 
-  setTimeout(() => {
-    document.querySelectorAll(".prose h2, .prose h3").forEach((heading) => {
-      if (heading.id) observer.observe(heading);
-    });
-  }, 500);
+  const observeHeadings = () => {
+    const headings = document.querySelectorAll("main h2, main h3");
+    if (headings.length > 0) {
+      headings.forEach((heading) => {
+        if (heading.id) observer.observe(heading);
+      });
+    } else {
+      setTimeout(observeHeadings, 100);
+    }
+  };
+
+  observeHeadings();
+};
+
+const scrollToHeading = (id) => {
+  activeId.value = id;
+  const el = document.getElementById(id);
+  if (el) {
+    const y = el.getBoundingClientRect().top + window.scrollY - 100;
+    window.scrollTo({ top: y, behavior: "smooth" });
+    history.pushState(null, null, `#${id}`);
+  }
 };
 
 watch(
@@ -260,6 +278,7 @@ const formatDate = (date) => {
                   v-for="link in currentDoc.body.toc.links"
                   :key="link.id"
                   :href="`#${link.id}`"
+                  @click.prevent="scrollToHeading(link.id)"
                   class="transition-colors group block relative pl-3"
                   :class="
                     activeId === link.id
