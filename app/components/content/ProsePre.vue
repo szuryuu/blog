@@ -47,7 +47,7 @@ const copyCode = async () => {
     class="my-8 rounded-2xl bg-zinc-900 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm"
   >
     <div
-      class="flex items-center justify-between px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-800/30"
+      class="flex items-center justify-between px-4 py-3 border-b border-zinc-700 dark:border-zinc-800 bg-zinc-800/30"
     >
       <span
         class="text-[10px] font-mono text-zinc-400 uppercase tracking-widest select-none"
@@ -72,10 +72,8 @@ const copyCode = async () => {
     </div>
 
     <pre
-      :class="[
-        props.class,
-        'p-4 sm:p-6 !my-0 overflow-x-auto text-sm text-zinc-100 bg-transparent',
-      ]"
+      :class="$props.class"
+      class="p-4 sm:p-6 !my-0 overflow-x-auto text-sm text-zinc-100 bg-transparent border-none"
     ><slot /></pre>
   </div>
 </template>
