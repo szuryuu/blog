@@ -234,7 +234,7 @@ const formatDate = (date) => {
                 v-for="tag in trendingTags"
                 :key="tag"
                 to="/tags"
-                class="px-2 py-1 bg-zinc-200/50 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded text-[10px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400 transition-colors"
+                class="px-3 py-1 bg-zinc-200/50 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-full text-[10px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400 transition-colors"
               >
                 #{{ tag }}
               </NuxtLink>

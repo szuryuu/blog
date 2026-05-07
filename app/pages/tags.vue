@@ -38,7 +38,7 @@ useSeoMeta({
       <span
         v-for="tag in allTags"
         :key="tag"
-        class="flex items-center gap-2 px-4 py-3 bg-zinc-200/50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-mono uppercase tracking-widest text-zinc-600 dark:text-zinc-400"
+        class="flex items-center gap-2 px-4 py-3 bg-zinc-200/50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 rounded-full text-sm font-mono uppercase tracking-widest text-zinc-600 dark:text-zinc-400"
       >
         <Tag :size="14" />
         {{ tag }}
