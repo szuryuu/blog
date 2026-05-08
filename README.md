@@ -1,3 +1,3 @@
 # Blog
 
-on development
+on development progress
