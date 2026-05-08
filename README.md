@@ -1,5 +1,3 @@
 # Blog
 
----
-
-my personal blog
+on development
