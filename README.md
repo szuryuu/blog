@@ -145,6 +145,7 @@ bun run generate
 
 - Site metadata (default description/title template, language) is configured in `nuxt.config.ts`.
 - Global styling is loaded from `assets/css/main.css`.
+- On development
 
 ## License
 
