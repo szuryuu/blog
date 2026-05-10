@@ -45,6 +45,8 @@ const currentCollection = computed(() => {
     return "infrastructure";
   if (route.path.startsWith("/writing/") && route.path.length > 9)
     return "writing";
+  if (route.path.startsWith("/project/") && route.path.length > 9)
+    return "projects";
   return null;
 });
 
@@ -132,7 +134,9 @@ const formatDate = (date) => {
 </script>
 
 <template>
-  <div class="min-h-screen flex transition-colors duration-300 w-full">
+  <div
+    class="min-h-screen flex transition-colors duration-300 w-full overflow-x-clip"
+  >
     <div
       v-if="isSidebarOpen"
       @click="toggleSidebar"
