@@ -132,7 +132,7 @@ const formatDate = (date) => {
 </script>
 
 <template>
-  <div class="min-h-screen flex transition-colors duration-300">
+  <div class="min-h-screen flex transition-colors duration-300 w-full">
     <div
       v-if="isSidebarOpen"
       @click="toggleSidebar"
@@ -141,7 +141,7 @@ const formatDate = (date) => {
 
     <AppSidebar :is-open="isSidebarOpen" @close="isSidebarOpen = false" />
 
-    <div class="flex-1 lg:ml-72 flex flex-col min-h-screen w-full">
+    <div class="flex-1 lg:ml-72 flex flex-col min-h-screen w-full min-w-0">
       <header
         class="h-20 flex items-center justify-between px-6 lg:px-12 sticky top-0 z-30 bg-zinc-50/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-transparent"
       >
@@ -210,7 +210,7 @@ const formatDate = (date) => {
         </main>
 
         <aside
-          class="hidden xl:flex w-64 shrink-0 sticky top-28 self-start flex-col gap-8"
+          class="hidden xl:flex w-64 shrink-0 sticky top-28 self-start flex-col gap-8 h-fit"
         >
           <div
             class="flex flex-col gap-4 border-l-2 border-zinc-200 dark:border-zinc-800 pl-4"
