@@ -1,20 +1,27 @@
 export default defineEventHandler(async (event) => {
   const { limit } = getQuery(event);
-
   const collections = ["writing", "ctf", "infrastructure", "projects"];
-  const promises = collections.map((col) =>
-    queryCollection(col)
-      .all()
-      .catch(() => []),
-  );
-  const results = await Promise.all(promises);
-  const allPosts = results.flat().filter(Boolean);
 
+  const results = await Promise.all(
+    collections.map((col) =>
+      queryCollection(event, col as any)
+        .all()
+        .catch(() => []),
+    ),
+  );
+
+  const allPosts = results.flat().filter(Boolean);
   const counts: Record<string, number> = {};
+
   for (const post of allPosts) {
-    const itemTags = post.tags || post.tech || [];
+    const itemTags: string[] = [];
+    if (Array.isArray(post.tags)) itemTags.push(...post.tags);
+    if (Array.isArray(post.tech)) itemTags.push(...post.tech);
+
     for (const tag of itemTags) {
-      counts[tag] = (counts[tag] || 0) + 1;
+      if (tag) {
+        counts[tag] = (counts[tag] || 0) + 1;
+      }
     }
   }
 
