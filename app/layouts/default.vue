@@ -7,12 +7,12 @@ import AppSidebar from "~/components/AppSidebar.vue";
 const route = useRoute();
 const router = useRouter();
 const isSidebarOpen = ref(false);
+const isTocOpen = ref(false);
+const isSearchOpen = ref(false);
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
 };
-
-const isSearchOpen = ref(false);
 
 const toggleSearch = () => {
   isSearchOpen.value = !isSearchOpen.value;
@@ -145,6 +145,68 @@ const formatDate = (date) => {
 
     <AppSidebar :is-open="isSidebarOpen" @close="isSidebarOpen = false" />
 
+    <div v-if="isTocOpen" class="fixed inset-0 z-50 xl:hidden flex justify-end">
+      <div
+        @click="isTocOpen = false"
+        class="absolute inset-0 bg-zinc-950/80 backdrop-blur-sm"
+      ></div>
+      <aside
+        class="relative w-72 sm:w-80 h-full bg-zinc-50 dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 flex flex-col shadow-2xl"
+      >
+        <div
+          class="flex items-center justify-between p-6 border-b border-zinc-200 dark:border-zinc-800"
+        >
+          <div class="flex items-center gap-2 text-emerald-500">
+            <List :size="18" />
+            <h3
+              class="font-mono text-xs uppercase tracking-widest text-zinc-900 dark:text-zinc-100 font-bold"
+            >
+              Contents
+            </h3>
+          </div>
+          <button
+            @click="isTocOpen = false"
+            class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+          >
+            <X :size="20" />
+          </button>
+        </div>
+        <nav
+          class="flex-1 overflow-y-auto p-6 flex flex-col gap-4 text-sm font-sans"
+        >
+          <a
+            v-for="link in currentDoc?.body?.toc?.links"
+            :key="link.id"
+            :href="`#${link.id}`"
+            @click.prevent="
+              scrollToHeading(link.id);
+              isTocOpen = false;
+            "
+            class="transition-colors group block relative pl-3"
+            :class="
+              activeId === link.id
+                ? 'text-zinc-900 dark:text-zinc-100 font-medium'
+                : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
+            "
+          >
+            <span
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 bg-emerald-500 transition-all duration-300"
+              :class="activeId === link.id ? 'h-full' : 'h-0 group-hover:h-1/2'"
+            ></span>
+            <span
+              :class="[
+                link.depth === 3 ? 'ml-3 text-xs' : '',
+                link.depth > 3 ? 'ml-6 text-xs' : '',
+              ]"
+              class="line-clamp-2 leading-snug"
+            >
+              {{ link.text }}
+            </span>
+          </a>
+        </nav>
+      </aside>
+    </div>
+
     <div class="flex-1 lg:ml-72 flex flex-col min-h-screen w-full min-w-0">
       <header
         class="h-20 flex items-center justify-between px-6 lg:px-12 sticky top-0 z-30 bg-zinc-50/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-transparent"
@@ -184,21 +246,32 @@ const formatDate = (date) => {
           </nav>
         </div>
 
-        <button
-          @click="toggleSearch"
-          class="flex items-center gap-3 px-3 py-2 rounded-lg bg-zinc-200/50 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors text-zinc-500 dark:text-zinc-400"
-          aria-label="Search"
-        >
-          <Search :size="16" />
-          <span class="text-sm font-sans hidden sm:inline-block"
-            >Search...</span
+        <div class="flex items-center gap-2">
+          <button
+            v-if="currentDoc?.body?.toc?.links?.length"
+            @click="isTocOpen = true"
+            class="xl:hidden flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-200/50 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors text-zinc-500 dark:text-zinc-400"
+            aria-label="Table of Contents"
           >
-          <kbd
-            class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-300/50 dark:bg-zinc-700/50 text-[10px] font-mono font-bold text-zinc-600 dark:text-zinc-300"
+            <List :size="16" />
+          </button>
+
+          <button
+            @click="toggleSearch"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg bg-zinc-200/50 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors text-zinc-500 dark:text-zinc-400"
+            aria-label="Search"
           >
-            <span class="text-xs">Ctrl</span> K
-          </kbd>
-        </button>
+            <Search :size="16" />
+            <span class="text-sm font-sans hidden sm:inline-block"
+              >Search...</span
+            >
+            <kbd
+              class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-300/50 dark:bg-zinc-700/50 text-[10px] font-mono font-bold text-zinc-600 dark:text-zinc-300"
+            >
+              <span class="text-xs">Ctrl</span> K
+            </kbd>
+          </button>
+        </div>
       </header>
 
       <div
