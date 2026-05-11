@@ -18,6 +18,13 @@ const toggleSearch = () => {
   isSearchOpen.value = !isSearchOpen.value;
 };
 
+const handleGlobalKeydown = (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+    e.preventDefault();
+    isSearchOpen.value = true;
+  }
+};
+
 const { data: recentArticles } = await useAsyncData("layout-recent", () => {
   return queryCollection("writing").order("date", "DESC").limit(3).all();
 });
@@ -116,11 +123,13 @@ watch(
 
 onMounted(() => {
   setupObserver();
+  window.addEventListener("keydown", handleGlobalKeydown);
 });
 
 onUnmounted(() => {
   if (observer) observer.disconnect();
   if (observerTimeout) clearTimeout(observerTimeout);
+  window.removeEventListener("keydown", handleGlobalKeydown);
 });
 
 const formatDate = (date) => {
