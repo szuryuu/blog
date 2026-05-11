@@ -1,24 +1,9 @@
 <script setup>
-import { computed } from "vue";
 import { Tag } from "lucide-vue-next";
 
-const { data: writings } = await useAsyncData("tags-writing", () =>
-  queryCollection("writing").all(),
+const { data: allTags } = await useAsyncData("all-tags", () =>
+  $fetch("/api/tags"),
 );
-const { data: ctfs } = await useAsyncData("tags-ctf", () =>
-  queryCollection("ctf").all(),
-);
-const { data: infras } = await useAsyncData("tags-infra", () =>
-  queryCollection("infrastructure").all(),
-);
-
-const allTags = computed(() => {
-  const tags = new Set();
-  writings.value?.forEach((p) => p.tags?.forEach((t) => tags.add(t)));
-  ctfs.value?.forEach((p) => p.tags?.forEach((t) => tags.add(t)));
-  infras.value?.forEach((p) => p.tags?.forEach((t) => tags.add(t)));
-  return Array.from(tags).sort();
-});
 
 useSeoMeta({
   title: "Tags",
@@ -34,7 +19,7 @@ useSeoMeta({
       EXPLORE TAGS
     </h1>
 
-    <div v-if="allTags.length > 0" class="flex flex-wrap gap-4">
+    <div v-if="allTags && allTags.length > 0" class="flex flex-wrap gap-4">
       <span
         v-for="tag in allTags"
         :key="tag"
