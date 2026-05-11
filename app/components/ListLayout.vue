@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import { Pin } from "lucide-vue-next";
 
 const props = defineProps({
@@ -59,10 +59,24 @@ const pinnedPosts = computed(() => {
   return posts.value.filter((post) => post.featured);
 });
 
-const regularPosts = computed(() => {
+const allRegularPosts = computed(() => {
   if (!posts.value) return [];
   return posts.value.filter((post) => !post.featured);
 });
+
+const displayLimit = ref(10);
+
+const regularPosts = computed(() => {
+  return allRegularPosts.value.slice(0, displayLimit.value);
+});
+
+const hasMore = computed(() => {
+  return displayLimit.value < allRegularPosts.value.length;
+});
+
+const loadMore = () => {
+  displayLimit.value += 10;
+};
 
 useSeoMeta({
   title: props.title,
@@ -186,6 +200,15 @@ useSeoMeta({
           </span>
         </div>
       </NuxtLink>
+    </div>
+
+    <div v-if="hasMore" class="mt-16 flex justify-center w-full">
+      <button
+        @click="loadMore"
+        class="px-6 py-3 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 bg-zinc-200/50 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-xl transition-colors"
+      >
+        Load More Transmissions
+      </button>
     </div>
 
     <div v-if="!posts || posts.length === 0" class="max-w-2xl w-full">
