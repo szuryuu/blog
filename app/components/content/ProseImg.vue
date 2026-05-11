@@ -40,6 +40,7 @@ const refinedSrc = computed(() => {
     :height="height"
     format="webp"
     loading="lazy"
-    class="rounded-2xl my-8 w-full object-cover border border-zinc-200 dark:border-zinc-800"
+    placeholder
+    class="rounded-2xl my-8 w-full object-cover border border-zinc-200 dark:border-zinc-800 bg-zinc-200/50 dark:bg-zinc-800/50"
   />
 </template>
