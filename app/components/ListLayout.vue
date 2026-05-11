@@ -8,7 +8,7 @@ const props = defineProps({
     required: true,
   },
   collection: {
-    type: String,
+    type: [String, Array],
     required: true,
   },
   emptyMessage: {
@@ -17,13 +17,42 @@ const props = defineProps({
   },
 });
 
-const { data: posts } = await useAsyncData(`${props.collection}-list`, () => {
-  const query = queryCollection(props.collection);
-  if (props.collection === "projects") {
-    return query.order("order", "ASC").all();
-  }
-  return query.order("date", "DESC").all();
-});
+const { data: posts } = await useAsyncData(
+  `list-${Array.isArray(props.collection) ? props.collection.join("-") : props.collection}`,
+  async () => {
+    if (Array.isArray(props.collection)) {
+      const promises = props.collection.map((col) =>
+        queryCollection(col)
+          .all()
+          .catch(() => []),
+      );
+      const results = await Promise.all(promises);
+      const allPosts = results.flat().filter(Boolean);
+
+      return allPosts.sort((a, b) => {
+        const dateA = a.date
+          ? new Date(a.date).getTime()
+          : a.year
+            ? new Date(`${a.year}-12-31`).getTime()
+            : 0;
+        const dateB = b.date
+          ? new Date(b.date).getTime()
+          : b.year
+            ? new Date(`${b.year}-12-31`).getTime()
+            : 0;
+
+        if (dateB !== dateA) return dateB - dateA;
+        return (a.order || 99) - (b.order || 99);
+      });
+    }
+
+    const query = queryCollection(props.collection);
+    if (props.collection === "projects" || props.collection === "project") {
+      return query.order("order", "ASC").all();
+    }
+    return query.order("date", "DESC").all();
+  },
+);
 
 const pinnedPosts = computed(() => {
   if (!posts.value) return [];
