@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed, nextTick, onMounted, onUnmounted } from "vue";
+import { ref, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { Search, X, ChevronRight } from "lucide-vue-next";
 
 const props = defineProps({
@@ -14,6 +14,7 @@ const emit = defineEmits(["close"]);
 const searchQuery = ref("");
 const debouncedQuery = ref("");
 const searchInput = ref(null);
+const searchContainer = ref(null);
 
 let timeout = null;
 
@@ -37,47 +38,50 @@ watch(
   },
 );
 
+const { data: filteredResults } = await useAsyncData(
+  "search-data",
+  () => {
+    if (!debouncedQuery.value.trim()) return Promise.resolve([]);
+    return $fetch("/api/search", { params: { q: debouncedQuery.value } });
+  },
+  { watch: [debouncedQuery] },
+);
+
 const handleEscape = (e) => {
   if (e.key === "Escape" && props.isOpen) {
     emit("close");
   }
 };
 
+const handleTab = (e) => {
+  if (!props.isOpen || e.key !== "Tab") return;
+  if (!searchContainer.value) return;
+
+  const focusable = searchContainer.value.querySelectorAll(
+    "input, button, a[href]",
+  );
+  if (focusable.length === 0) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+};
+
 onMounted(() => {
   window.addEventListener("keydown", handleEscape);
+  window.addEventListener("keydown", handleTab);
 });
 
 onUnmounted(() => {
   window.removeEventListener("keydown", handleEscape);
-});
-
-const { data: allPosts } = await useAsyncData("search-data", async () => {
-  const collections = ["writing", "ctf", "infrastructure", "projects"];
-  const promises = collections.map((col) =>
-    queryCollection(col)
-      .all()
-      .catch(() => []),
-  );
-  const results = await Promise.all(promises);
-  return results.flat().filter(Boolean);
-});
-
-const filteredResults = computed(() => {
-  if (!debouncedQuery.value.trim() || !allPosts.value) return [];
-  const q = debouncedQuery.value.toLowerCase();
-
-  return allPosts.value
-    .filter((post) => {
-      const matchTitle = post.title?.toLowerCase().includes(q);
-      const matchDesc = post.description?.toLowerCase().includes(q);
-      const matchTags = post.tags?.some((tag) => tag.toLowerCase().includes(q));
-      const matchTech = post.tech?.some((tech) =>
-        tech.toLowerCase().includes(q),
-      );
-
-      return matchTitle || matchDesc || matchTags || matchTech;
-    })
-    .slice(0, 10);
+  window.removeEventListener("keydown", handleTab);
 });
 </script>
 
@@ -91,6 +95,7 @@ const filteredResults = computed(() => {
       class="absolute inset-0 bg-zinc-950/60 backdrop-blur-sm"
     ></div>
     <div
+      ref="searchContainer"
       class="relative w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 flex flex-col"
     >
       <div
@@ -123,7 +128,7 @@ const filteredResults = computed(() => {
         </div>
 
         <div
-          v-else-if="filteredResults.length === 0"
+          v-else-if="!filteredResults || filteredResults.length === 0"
           class="p-8 text-center text-zinc-500 font-sans text-sm sm:text-base"
         >
           No results found for "{{ debouncedQuery }}".

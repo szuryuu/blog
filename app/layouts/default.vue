@@ -6,6 +6,8 @@ import AppSidebar from "~/components/AppSidebar.vue";
 
 const route = useRoute();
 const router = useRouter();
+const nuxtApp = useNuxtApp();
+
 const isSidebarOpen = ref(false);
 const isTocOpen = ref(false);
 const isSearchOpen = ref(false);
@@ -25,13 +27,25 @@ const handleGlobalKeydown = (e) => {
   }
 };
 
-const { data: recentArticles } = await useAsyncData("layout-recent", () => {
-  return queryCollection("writing").order("date", "DESC").limit(3).all();
-});
+const { data: recentArticles } = await useAsyncData(
+  "layout-recent",
+  () => queryCollection("writing").order("date", "DESC").limit(3).all(),
+  {
+    getCachedData(key) {
+      return nuxtApp.payload.data[key] || nuxtApp.static.data[key];
+    },
+  },
+);
 
-const { data: allWritings } = await useAsyncData("layout-tags", () => {
-  return queryCollection("writing").all();
-});
+const { data: allWritings } = await useAsyncData(
+  "layout-tags",
+  () => queryCollection("writing").all(),
+  {
+    getCachedData(key) {
+      return nuxtApp.payload.data[key] || nuxtApp.static.data[key];
+    },
+  },
+);
 
 const trendingTags = computed(() => {
   if (!allWritings.value) return [];
@@ -57,12 +71,16 @@ const currentCollection = computed(() => {
   return null;
 });
 
-const { data: currentDoc, refresh } = await useAsyncData("layout-doc", () => {
-  if (currentCollection.value) {
-    return queryCollection(currentCollection.value).path(route.path).first();
-  }
-  return null;
-});
+const { data: currentDoc } = await useAsyncData(
+  () => `layout-doc-${route.path}`,
+  () => {
+    if (currentCollection.value) {
+      return queryCollection(currentCollection.value).path(route.path).first();
+    }
+    return null;
+  },
+  { watch: [() => route.path] },
+);
 
 const activeId = ref("");
 let observer = null;
@@ -116,7 +134,6 @@ const scrollToHeading = (id) => {
 watch(
   () => route.path,
   () => {
-    refresh();
     setupObserver();
   },
 );
