@@ -8,26 +8,42 @@ export default defineEventHandler(async (event) => {
   if (!colsParam) return [];
   const collections = colsParam.split(",");
 
-  let fetchedPosts: any[] = [];
+  const fetchedPosts: any[] = [];
 
-  const promises = collections.map((col) =>
-    queryCollection(event, col as any)
+  if (collections.includes("writing")) {
+    const data = await queryCollection(event, "writing")
       .all()
-      .catch(() => []),
-  );
+      .catch(() => []);
+    fetchedPosts.push(...data);
+  }
+  if (collections.includes("ctf")) {
+    const data = await queryCollection(event, "ctf")
+      .all()
+      .catch(() => []);
+    fetchedPosts.push(...data);
+  }
+  if (collections.includes("infrastructure")) {
+    const data = await queryCollection(event, "infrastructure")
+      .all()
+      .catch(() => []);
+    fetchedPosts.push(...data);
+  }
+  if (collections.includes("projects") || collections.includes("project")) {
+    const data = await queryCollection(event, "projects")
+      .all()
+      .catch(() => []);
+    fetchedPosts.push(...data);
+  }
 
-  const results = await Promise.all(promises);
-  fetchedPosts = results.flat().filter(Boolean);
+  let results = fetchedPosts.filter(Boolean);
 
   if (
     collections.length === 1 &&
     (collections[0] === "projects" || collections[0] === "project")
   ) {
-    fetchedPosts = fetchedPosts.sort(
-      (a, b) => (a.order || 99) - (b.order || 99),
-    );
+    results = results.sort((a, b) => (a.order || 99) - (b.order || 99));
   } else {
-    fetchedPosts = fetchedPosts.sort((a, b) => {
+    results = results.sort((a, b) => {
       const dateA = a.date
         ? new Date(a.date).getTime()
         : a.year
@@ -38,14 +54,13 @@ export default defineEventHandler(async (event) => {
         : b.year
           ? new Date(`${b.year}-12-31`).getTime()
           : 0;
-
       if (dateB !== dateA) return dateB - dateA;
       return (a.order || 99) - (b.order || 99);
     });
   }
 
   if (tagFilter && tagFilter !== "all") {
-    fetchedPosts = fetchedPosts.filter((post) => {
+    results = results.filter((post) => {
       const t: string[] = [];
       if (Array.isArray(post.tags)) t.push(...post.tags);
       if (Array.isArray(post.tech)) t.push(...post.tech);
@@ -53,5 +68,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return fetchedPosts;
+  return results;
 });

@@ -1,16 +1,20 @@
 export default defineEventHandler(async (event) => {
   const { limit } = getQuery(event);
-  const collections = ["writing", "ctf", "infrastructure", "projects"];
 
-  const results = await Promise.all(
-    collections.map((col) =>
-      queryCollection(event, col as any)
-        .all()
-        .catch(() => []),
-    ),
-  );
+  const w = await queryCollection(event, "writing")
+    .all()
+    .catch(() => []);
+  const c = await queryCollection(event, "ctf")
+    .all()
+    .catch(() => []);
+  const i = await queryCollection(event, "infrastructure")
+    .all()
+    .catch(() => []);
+  const p = await queryCollection(event, "projects")
+    .all()
+    .catch(() => []);
 
-  const allPosts = results.flat().filter(Boolean);
+  const allPosts = [...w, ...c, ...i, ...p].filter(Boolean);
   const counts: Record<string, number> = {};
 
   for (const post of allPosts) {
