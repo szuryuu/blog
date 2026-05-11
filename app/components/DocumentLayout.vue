@@ -1,15 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRoute } from "vue-router";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Calendar,
-  Clock,
-  Grid,
-  Github,
-  ExternalLink,
-} from "lucide-vue-next";
+import { Calendar, Clock, Grid, Github, ExternalLink } from "lucide-vue-next";
 
 const props = defineProps({
   collection: {
@@ -64,22 +56,50 @@ const { data: allPosts } = await useAsyncData(`${props.collection}-all`, () => {
     .all();
 });
 
-const currentIndex = computed(
-  () => allPosts.value?.findIndex((p) => p.path === route.path) ?? -1,
-);
-const prevArticle = computed(() =>
-  currentIndex.value > 0 ? allPosts.value?.[currentIndex.value - 1] : null,
-);
-const nextArticle = computed(() =>
-  currentIndex.value < (allPosts.value?.length ?? 0) - 1
-    ? allPosts.value?.[currentIndex.value + 1]
-    : null,
-);
+const relatedPosts = computed(() => {
+  if (!allPosts.value || !page.value) return [];
+  const currentTags = page.value.tags || page.value.tech || [];
+  return allPosts.value
+    .filter((p) => p.path !== page.value.path)
+    .map((p) => {
+      const pTags = p.tags || p.tech || [];
+      const matchCount = pTags.filter((t) => currentTags.includes(t)).length;
+      return { ...p, matchCount };
+    })
+    .filter((p) => p.matchCount > 0)
+    .sort((a, b) => {
+      if (b.matchCount !== a.matchCount) return b.matchCount - a.matchCount;
+      const dateA = new Date(a.date || a.year || 0).getTime();
+      const dateB = new Date(b.date || b.year || 0).getTime();
+      return dateB - dateA;
+    })
+    .slice(0, 2);
+});
 
 useSeoMeta({
   title: page.value.title,
   description: page.value.description,
   ogImage: props.layoutType === "project" ? page.value.image : page.value.cover,
+});
+
+useHead({
+  link: [{ rel: "canonical", href: `https://szuryuu.github.io${route.path}` }],
+  script: [
+    {
+      type: "application/ld+json",
+      innerHTML: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type":
+          props.layoutType === "article" ? "TechArticle" : "SoftwareSourceCode",
+        headline: page.value.title,
+        description: page.value.description,
+        author: { "@type": "Person", name: "szuryuu" },
+        datePublished: page.value.date || page.value.year,
+        url: `https://szuryuu.github.io${route.path}`,
+        image: `https://szuryuu.github.io${props.layoutType === "project" ? page.value.image : page.value.cover}`,
+      }),
+    },
+  ],
 });
 
 const scrollProgress = ref(0);
@@ -139,6 +159,7 @@ onUnmounted(() => {
           height="1080"
           format="webp"
           preload
+          placeholder
         />
         <div
           class="absolute inset-0 bg-gradient-to-t from-zinc-100 dark:from-zinc-900 via-zinc-100/50 dark:via-zinc-900/50 to-transparent"
@@ -267,57 +288,44 @@ onUnmounted(() => {
     </div>
 
     <div
-      class="mt-20 pt-10 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row justify-between gap-6 pb-12 w-full min-w-0"
+      class="mt-20 pt-10 border-t border-zinc-200 dark:border-zinc-800 w-full min-w-0"
     >
-      <NuxtLink
-        v-if="prevArticle"
-        :to="prevArticle.path"
-        class="group flex-1 min-w-0 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:bg-zinc-900/50 hover:dark:bg-zinc-900 transition-colors"
-      >
-        <div
-          class="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-3"
-        >
-          <ArrowLeft
-            class="w-3 h-3 shrink-0 group-hover:-translate-x-1 transition-transform"
-          />
-          <span class="truncate">Previous Entry</span>
-        </div>
-        <h3
-          class="font-heading text-2xl text-zinc-900 dark:text-zinc-100 line-clamp-2 break-words"
-        >
-          {{ prevArticle.title }}
+      <div class="flex items-center justify-between mb-8">
+        <h3 class="font-heading text-3xl text-zinc-900 dark:text-zinc-100">
+          Related Transmissions
         </h3>
-      </NuxtLink>
-      <div v-else class="flex-1 min-w-0"></div>
-
-      <NuxtLink
-        :to="allLink"
-        class="flex items-center justify-center gap-2 px-6 py-4 text-xs font-mono uppercase tracking-widest text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors shrink-0"
-      >
-        <Grid class="w-4 h-4 shrink-0" />
-        {{ allLinkText }}
-      </NuxtLink>
-
-      <NuxtLink
-        v-if="nextArticle"
-        :to="nextArticle.path"
-        class="group flex-1 min-w-0 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:bg-zinc-900/50 hover:dark:bg-zinc-900 transition-colors text-right"
-      >
-        <div
-          class="flex items-center justify-end gap-2 text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-3"
+        <NuxtLink
+          :to="allLink"
+          class="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
         >
-          <span class="truncate">Next Entry</span>
-          <ArrowRight
-            class="w-3 h-3 shrink-0 group-hover:translate-x-1 transition-transform"
-          />
-        </div>
-        <h3
-          class="font-heading text-2xl text-zinc-900 dark:text-zinc-100 line-clamp-2 break-words"
+          <Grid class="w-4 h-4" />
+          {{ allLinkText }}
+        </NuxtLink>
+      </div>
+
+      <div
+        v-if="relatedPosts.length > 0"
+        class="flex flex-col sm:flex-row gap-6 w-full"
+      >
+        <NuxtLink
+          v-for="post in relatedPosts"
+          :key="post.path"
+          :to="post.path"
+          class="group flex-1 min-w-0 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:bg-zinc-900/50 hover:dark:bg-zinc-900 transition-colors"
         >
-          {{ nextArticle.title }}
-        </h3>
-      </NuxtLink>
-      <div v-else class="flex-1 min-w-0"></div>
+          <h4
+            class="font-heading text-2xl text-zinc-900 dark:text-zinc-100 line-clamp-2 break-words mb-3 group-hover:text-emerald-500 transition-colors"
+          >
+            {{ post.title }}
+          </h4>
+          <p class="text-sm font-sans text-zinc-500 line-clamp-2">
+            {{ post.description }}
+          </p>
+        </NuxtLink>
+      </div>
+      <div v-else class="flex justify-center w-full pb-8">
+        <p class="text-sm font-sans text-zinc-500">End of transmission.</p>
+      </div>
     </div>
   </article>
 </template>
