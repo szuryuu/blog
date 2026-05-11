@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import { Menu, X, Search, Clock, Tag, List } from "lucide-vue-next";
+import { Menu, X, Search, Clock, Tag, List, ArrowUp } from "lucide-vue-next";
 import { useRoute, useRouter } from "vue-router";
 import AppSidebar from "~/components/AppSidebar.vue";
 
@@ -11,11 +11,11 @@ const nuxtApp = useNuxtApp();
 const isSidebarOpen = ref(false);
 const isTocOpen = ref(false);
 const isSearchOpen = ref(false);
+const showBackToTop = ref(false);
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
 };
-
 const toggleSearch = () => {
   isSearchOpen.value = !isSearchOpen.value;
 };
@@ -27,13 +27,20 @@ const handleGlobalKeydown = (e) => {
   }
 };
 
+const handleScroll = () => {
+  showBackToTop.value = window.scrollY > 400;
+};
+
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
 const { data: recentArticles } = await useAsyncData(
   "layout-recent",
   () => queryCollection("writing").order("date", "DESC").limit(3).all(),
   {
-    getCachedData(key) {
-      return nuxtApp.payload.data[key] || nuxtApp.static.data[key];
-    },
+    getCachedData: (key) =>
+      nuxtApp.payload.data[key] || nuxtApp.static.data[key],
   },
 );
 
@@ -41,71 +48,44 @@ const { data: trendingTags } = await useAsyncData(
   "layout-tags",
   () => $fetch("/api/tags", { params: { limit: 5 } }),
   {
-    getCachedData(key) {
-      return nuxtApp.payload.data[key] || nuxtApp.static.data[key];
-    },
+    getCachedData: (key) =>
+      nuxtApp.payload.data[key] || nuxtApp.static.data[key],
   },
 );
 
 const currentCollection = computed(() => {
-  if (route.path.startsWith("/ctf/") && route.path.length > 5) return "ctf";
-  if (route.path.startsWith("/infrastructure/") && route.path.length > 16)
-    return "infrastructure";
-  if (route.path.startsWith("/writing/") && route.path.length > 9)
-    return "writing";
-  if (route.path.startsWith("/project/") && route.path.length > 9)
-    return "projects";
+  if (route.path.startsWith("/ctf/")) return "ctf";
+  if (route.path.startsWith("/infrastructure/")) return "infrastructure";
+  if (route.path.startsWith("/writing/")) return "writing";
+  if (route.path.startsWith("/project/")) return "projects";
   return null;
 });
 
 const { data: currentDoc } = await useAsyncData(
   () => `layout-doc-${route.path}`,
-  () => {
-    if (currentCollection.value) {
-      return queryCollection(currentCollection.value).path(route.path).first();
-    }
-    return null;
-  },
+  () =>
+    currentCollection.value
+      ? queryCollection(currentCollection.value).path(route.path).first()
+      : null,
   { watch: [() => route.path] },
 );
 
 const activeId = ref("");
 let observer = null;
-let observerTimeout = null;
 
 const setupObserver = () => {
-  if (observer) {
-    observer.disconnect();
-  }
-  if (observerTimeout) {
-    clearTimeout(observerTimeout);
-  }
-
+  if (observer) observer.disconnect();
   observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          activeId.value = entry.target.id;
-        }
+        if (entry.isIntersecting) activeId.value = entry.target.id;
       });
     },
-    { rootMargin: "-120px 0px -60% 0px", threshold: 0 },
+    { rootMargin: "-120px 0px -60% 0px" },
   );
-
-  let retryCount = 0;
-  const observeHeadings = () => {
-    const headings = document.querySelectorAll("main h2, main h3");
-    if (headings.length > 0) {
-      headings.forEach((heading) => {
-        if (heading.id) observer.observe(heading);
-      });
-    } else if (retryCount < 15) {
-      retryCount++;
-      observerTimeout = setTimeout(observeHeadings, 100);
-    }
-  };
-
-  observeHeadings();
+  document.querySelectorAll("main h2, main h3").forEach((h) => {
+    if (h.id) observer.observe(h);
+  });
 };
 
 const scrollToHeading = (id) => {
@@ -118,22 +98,16 @@ const scrollToHeading = (id) => {
   }
 };
 
-watch(
-  () => route.path,
-  () => {
-    setupObserver();
-  },
-);
-
 onMounted(() => {
   setupObserver();
   window.addEventListener("keydown", handleGlobalKeydown);
+  window.addEventListener("scroll", handleScroll, { passive: true });
 });
 
 onUnmounted(() => {
   if (observer) observer.disconnect();
-  if (observerTimeout) clearTimeout(observerTimeout);
   window.removeEventListener("keydown", handleGlobalKeydown);
+  window.removeEventListener("scroll", handleScroll);
 });
 
 const formatDate = (date) => {
@@ -155,7 +129,6 @@ const formatDate = (date) => {
       @click="toggleSidebar"
       class="fixed inset-0 bg-zinc-950/80 z-40 lg:hidden backdrop-blur-sm"
     ></div>
-
     <AppSidebar :is-open="isSidebarOpen" @close="isSidebarOpen = false" />
 
     <div v-if="isTocOpen" class="fixed inset-0 z-50 xl:hidden flex justify-end">
@@ -164,7 +137,7 @@ const formatDate = (date) => {
         class="absolute inset-0 bg-zinc-950/80 backdrop-blur-sm"
       ></div>
       <aside
-        class="relative w-72 sm:w-80 h-full bg-zinc-50 dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 flex flex-col shadow-2xl"
+        class="relative w-72 h-full bg-zinc-50 dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 flex flex-col shadow-2xl"
       >
         <div
           class="flex items-center justify-between p-6 border-b border-zinc-200 dark:border-zinc-800"
@@ -179,7 +152,7 @@ const formatDate = (date) => {
           </div>
           <button
             @click="isTocOpen = false"
-            class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            class="text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
           >
             <X :size="20" />
           </button>
@@ -207,10 +180,7 @@ const formatDate = (date) => {
               :class="activeId === link.id ? 'h-full' : 'h-0 group-hover:h-1/2'"
             ></span>
             <span
-              :class="[
-                link.depth === 3 ? 'ml-3 text-xs' : '',
-                link.depth > 3 ? 'ml-6 text-xs' : '',
-              ]"
+              :class="link.depth === 3 ? 'ml-3 text-xs' : ''"
               class="line-clamp-2 leading-snug"
             >
               {{ link.text }}
@@ -227,52 +197,23 @@ const formatDate = (date) => {
         <div class="flex items-center gap-4">
           <button
             @click="toggleSidebar"
-            class="lg:hidden p-2 -ml-2 text-zinc-900 dark:text-zinc-100"
+            class="lg:hidden p-2 text-zinc-900 dark:text-zinc-100"
           >
             <Menu v-if="!isSidebarOpen" :size="24" />
             <X v-else :size="24" />
           </button>
-
-          <nav
-            aria-label="Breadcrumb"
-            class="hidden sm:flex font-mono text-xs text-zinc-400 uppercase tracking-widest"
-          >
-            <ol class="flex items-center gap-2">
-              <li>
-                <NuxtLink
-                  to="/"
-                  class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-                  >szuryuu</NuxtLink
-                >
-              </li>
-              <li v-if="$route.path !== '/'">
-                <span class="text-zinc-600 dark:text-zinc-500">/</span>
-              </li>
-              <li v-if="$route.path !== '/'">
-                <NuxtLink
-                  :to="$route.path"
-                  class="text-zinc-900 dark:text-zinc-100"
-                  >{{ $route.path.split("/")[1] || "blog" }}</NuxtLink
-                >
-              </li>
-            </ol>
-          </nav>
         </div>
-
         <div class="flex items-center gap-2">
           <button
             v-if="currentDoc?.body?.toc?.links?.length"
             @click="isTocOpen = true"
-            class="xl:hidden flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-200/50 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors text-zinc-500 dark:text-zinc-400"
-            aria-label="Table of Contents"
+            class="xl:hidden flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-200/50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400"
           >
             <List :size="16" />
           </button>
-
           <button
             @click="toggleSearch"
-            class="flex items-center gap-3 px-3 py-2 rounded-lg bg-zinc-200/50 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors text-zinc-500 dark:text-zinc-400"
-            aria-label="Search"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg bg-zinc-200/50 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400"
           >
             <Search :size="16" />
             <span class="text-sm font-sans hidden sm:inline-block"
@@ -281,7 +222,7 @@ const formatDate = (date) => {
             <kbd
               class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-300/50 dark:bg-zinc-700/50 text-[10px] font-mono font-bold text-zinc-600 dark:text-zinc-300"
             >
-              <span class="text-xs">Ctrl</span> K
+              Ctrl K
             </kbd>
           </button>
         </div>
@@ -298,7 +239,6 @@ const formatDate = (date) => {
             &copy; {{ new Date().getFullYear() }} szuryuu
           </footer>
         </main>
-
         <aside
           class="hidden xl:flex w-64 shrink-0 sticky top-28 self-start flex-col gap-8 h-fit"
         >
@@ -333,9 +273,7 @@ const formatDate = (date) => {
               </NuxtLink>
             </div>
           </div>
-
           <div class="w-full h-px bg-zinc-200 dark:bg-zinc-800/50"></div>
-
           <div
             class="flex flex-col gap-4 border-l-2 border-zinc-200 dark:border-zinc-800 pl-4"
           >
@@ -351,64 +289,25 @@ const formatDate = (date) => {
               <NuxtLink
                 v-for="tag in trendingTags"
                 :key="tag"
-                to="/tags"
+                :to="`/tags/${encodeURIComponent(tag.toLowerCase())}`"
                 class="px-3 py-1 bg-zinc-200/50 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-full text-[10px] font-mono uppercase tracking-widest text-zinc-500 dark:text-zinc-400 transition-colors"
               >
                 #{{ tag }}
               </NuxtLink>
             </div>
           </div>
-
-          <template v-if="currentDoc?.body?.toc?.links?.length">
-            <div class="w-full h-px bg-zinc-200 dark:bg-zinc-800/50"></div>
-
-            <div
-              class="flex flex-col gap-4 border-l-2 border-zinc-200 dark:border-zinc-800 pl-4"
-            >
-              <div class="flex items-center gap-2">
-                <List :size="14" class="text-emerald-500" />
-                <h3
-                  class="font-mono text-xs uppercase tracking-widest text-zinc-900 dark:text-zinc-100 font-bold"
-                >
-                  Contents
-                </h3>
-              </div>
-              <nav class="flex flex-col gap-2.5 text-sm font-sans">
-                <a
-                  v-for="link in currentDoc.body.toc.links"
-                  :key="link.id"
-                  :href="`#${link.id}`"
-                  @click.prevent="scrollToHeading(link.id)"
-                  class="transition-colors group block relative pl-3"
-                  :class="
-                    activeId === link.id
-                      ? 'text-zinc-900 dark:text-zinc-100 font-medium'
-                      : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
-                  "
-                >
-                  <span
-                    class="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 bg-emerald-500 transition-all duration-300"
-                    :class="
-                      activeId === link.id ? 'h-full' : 'h-0 group-hover:h-1/2'
-                    "
-                  ></span>
-                  <span
-                    :class="[
-                      link.depth === 3 ? 'ml-3 text-xs' : '',
-                      link.depth > 3 ? 'ml-6 text-xs' : '',
-                    ]"
-                    class="line-clamp-2 leading-snug"
-                  >
-                    {{ link.text }}
-                  </span>
-                </a>
-              </nav>
-            </div>
-          </template>
         </aside>
       </div>
-    </div>
 
+      <button
+        v-if="showBackToTop"
+        @click="scrollToTop"
+        class="fixed bottom-8 right-8 z-40 p-3 bg-zinc-900 dark:bg-zinc-100 text-zinc-50 dark:text-zinc-900 rounded-2xl shadow-2xl hover:scale-110 transition-all duration-300"
+        aria-label="Back to top"
+      >
+        <ArrowUp :size="20" />
+      </button>
+    </div>
     <GlobalSearch :is-open="isSearchOpen" @close="isSearchOpen = false" />
   </div>
 </template>
