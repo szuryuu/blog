@@ -22,6 +22,18 @@ defineProps({
 });
 
 defineEmits(["close"]);
+
+const categories = [
+  { label: "Writing", path: "/writing", icon: Terminal },
+  { label: "CTF", path: "/ctf", icon: Shield },
+  { label: "Infrastructure", path: "/infrastructure", icon: Network },
+  { label: "Projects", path: "/project-documentation", icon: FolderOpen },
+];
+
+const explore = [
+  { label: "Tags", path: "/tags", icon: Tag },
+  { label: "About", path: "/about", icon: User },
+];
 </script>
 
 <template>
@@ -72,40 +84,15 @@ defineEmits(["close"]);
           Categories
         </span>
         <NuxtLink
+          v-for="item in categories"
+          :key="item.path"
           @click="$emit('close')"
-          to="/writing"
+          :to="item.path"
           class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
           active-class="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
         >
-          <Terminal :size="18" />
-          <span>Writing</span>
-        </NuxtLink>
-        <NuxtLink
-          @click="$emit('close')"
-          to="/ctf"
-          class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
-          active-class="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
-        >
-          <Shield :size="18" />
-          <span>CTF</span>
-        </NuxtLink>
-        <NuxtLink
-          @click="$emit('close')"
-          to="/infrastructure"
-          class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
-          active-class="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
-        >
-          <Network :size="18" />
-          <span>Infrastructure</span>
-        </NuxtLink>
-        <NuxtLink
-          @click="$emit('close')"
-          to="/project-documentation"
-          class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
-          active-class="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
-        >
-          <FolderOpen :size="18" />
-          <span>Projects</span>
+          <component :is="item.icon" :size="18" />
+          <span>{{ item.label }}</span>
         </NuxtLink>
       </div>
 
@@ -116,22 +103,15 @@ defineEmits(["close"]);
           Explore
         </span>
         <NuxtLink
+          v-for="item in explore"
+          :key="item.path"
           @click="$emit('close')"
-          to="/tags"
+          :to="item.path"
           class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
           active-class="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
         >
-          <Tag :size="18" />
-          <span>Tags</span>
-        </NuxtLink>
-        <NuxtLink
-          @click="$emit('close')"
-          to="/about"
-          class="flex items-center gap-4 px-4 py-3 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 rounded-2xl font-mono text-sm transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800"
-          active-class="bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
-        >
-          <User :size="18" />
-          <span>About</span>
+          <component :is="item.icon" :size="18" />
+          <span>{{ item.label }}</span>
         </NuxtLink>
       </div>
     </nav>
