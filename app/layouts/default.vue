@@ -37,28 +37,15 @@ const { data: recentArticles } = await useAsyncData(
   },
 );
 
-const { data: allWritings } = await useAsyncData(
+const { data: trendingTags } = await useAsyncData(
   "layout-tags",
-  () => queryCollection("writing").all(),
+  () => $fetch("/api/tags", { params: { limit: 5 } }),
   {
     getCachedData(key) {
       return nuxtApp.payload.data[key] || nuxtApp.static.data[key];
     },
   },
 );
-
-const trendingTags = computed(() => {
-  if (!allWritings.value) return [];
-  const tags = allWritings.value.flatMap((p) => p.tags || []);
-  const counts = tags.reduce((acc, tag) => {
-    acc[tag] = (acc[tag] || 0) + 1;
-    return acc;
-  }, {});
-  return Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map((t) => t[0]);
-});
 
 const currentCollection = computed(() => {
   if (route.path.startsWith("/ctf/") && route.path.length > 5) return "ctf";
